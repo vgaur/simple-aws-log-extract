@@ -1,15 +1,15 @@
 # This script export the code build log for a particular log group and stream
 
 
-import boto3
+import boto3,os
 from datetime import datetime, timedelta
 import time
 import argparse
 
 arg_parser = argparse.ArgumentParser()
-arg_parser.add_argument('--group', help='(required) : AWS Log group ', required=True, dest='group')
+arg_parser.add_argument('--group', help='(required) : AWS Log group ', required=False, dest='group', default='/aws/codebuild/XXX')
 arg_parser.add_argument('--stream', help='(required) : AWS Log stream ', required=True, dest='stream')
-arg_parser.add_argument('--outfile', help='(required) : Local file where logs will be downloaded ', required=True, dest='outfile')
+arg_parser.add_argument('--outfile', help='(required) : Local file where logs will be downloaded ', required=False, dest='outfile', default='/Users/YYY/log/awslog/')
 
 cmdline_params = arg_parser.parse_args()
 
@@ -17,6 +17,11 @@ client = boto3.client('logs')
 
 log_group = cmdline_params.group
 latestlogStreamName = cmdline_params.stream
+try:
+    os.remove(cmdline_params.outfile)
+except OSError:
+    pass
+
 log_output_file = open(cmdline_params.outfile, "w")
 
 
@@ -41,4 +46,5 @@ while True:
 
 log_output_file.close()
 print(response)
+
 
